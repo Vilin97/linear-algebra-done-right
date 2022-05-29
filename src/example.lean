@@ -65,9 +65,52 @@ end
 
 #check linear_independent
 
--- example : ∃ t a b c : ℝ, a*(3,1,4) + b*(2,-3,5) + c*(5,9,t) = 0 ∧ (a,b,c) ≠ (0,0,0) :=
+example : ∃ t a b c : ℝ, a • ((3,1,4) : ℝ × ℝ × ℝ) + b • (2,-3,5) + c • (5,9,t) = (0,0,0) ∧ (a,b,c) ≠ (0,0,0) :=
+begin
+  refine ⟨2, 3, -2, -1, _⟩,
+  split,
+    {simp, split, ring, split, ring, ring,},
+    {simp,},
+end
+
+-- inductive ι : Type
+-- | i1 : ι
+-- | i2 : ι
+-- | i3 : ι
+
+-- def i : ι → ℝ × ℝ × ℝ :=
+-- | ι.i1 := (3,1,4)
+-- | i2 := (2,-3,5)
+-- | i3 := (5,9,t)
+
+-- example : ∃ t : ℝ, ¬ linear_independent ℝ ({(3,1,4), (2,-3,5), (5,9,t)} : set ℝ × ℝ × ℝ) := 
 -- begin
---   sorry,
+  
 -- end
--- 
--- example ∃ t : ℝ, ¬ linear_independent ℝ
+
+
+
+
+
+
+
+
+-- -- namespace hidden
+
+-- -- inductive nat : Type
+-- -- | zero : nat
+-- -- | succ : nat → nat
+-- -- -- BEGIN
+-- -- namespace nat
+
+-- -- def add (m n : nat) : nat :=
+
+-- -- -- nat.rec_on n m (λ n add_m_n, succ add_m_n)
+
+-- -- -- try it out
+-- -- #reduce add (succ zero) (succ (succ zero))
+
+-- end nat
+-- -- END
+
+-- end hidden
