@@ -1,8 +1,11 @@
 import tactic -- imports all the Lean tactics
 import linear_algebra.basis
 import data.real.basic
+import data.matrix.notation
 
--- Exercise 1 in chapter 2
+-- Exercise 2.A.1
+
+namespace exercise2A1
 
 open submodule
 
@@ -61,56 +64,75 @@ begin
       exact mem_pair_right hp,
 end
 
--- Exercise 3 in chapter 2
+end exercise2A1
 
-#check linear_independent
+-- Exercise 2.A.3
 
+namespace exercise2A3
+-- approach 1
 example : ∃ t a b c : ℝ, a • ((3,1,4) : ℝ × ℝ × ℝ) + b • (2,-3,5) + c • (5,9,t) = (0,0,0) ∧ (a,b,c) ≠ (0,0,0) :=
 begin
-  refine ⟨2, 3, -2, -1, _⟩,
-  split,
-    {simp, split, ring, split, ring, ring,},
-    {simp,},
+  refine ⟨2, 3, -2, -1, _, by simp⟩,
+  simp, split, ring, split, ring, ring,
 end
 
--- inductive ι : Type
--- | i1 : ι
--- | i2 : ι
--- | i3 : ι
+-- approach 2
+@[derive fintype] inductive ι : Type
+| i1 : ι
+| i2 : ι
+| i3 : ι
 
--- def i : ι → ℝ × ℝ × ℝ :=
--- | ι.i1 := (3,1,4)
--- | i2 := (2,-3,5)
--- | i3 := (5,9,t)
+def ind (t : ℝ) (i:ι) : ℝ × ℝ × ℝ :=
+ι.cases_on i (3,1,4) (2,-3,5) (5,9,t)
 
--- example : ∃ t : ℝ, ¬ linear_independent ℝ ({(3,1,4), (2,-3,5), (5,9,t)} : set ℝ × ℝ × ℝ) := 
--- begin
+example : ∃ t : ℝ, ¬ linear_independent ℝ (ind t) := 
+begin
+  use 2,
+  rw fintype.not_linear_independent_iff,
+  use (λ i, ι.cases_on i (3) (-2) (-1)),
+  split,
+  sorry,
+  sorry,
+end
+
+--approach 3
+def ind' (t : ℝ) :=
+![![3,1,4], ![2,-3,5], ![5,9,t]]
+
+example : ∃ t : ℝ, ¬ linear_independent ℝ (ind' t) :=
+begin
+  use 2,
+  rw fintype.not_linear_independent_iff,
+  use ![3, -2, -1],
+  split,
+  norm_num [fin.sum_univ_succ, ind'],
+  use 0,
+  norm_num,
+end
+
+#check ind 2 -- ind 2 : ι → ℝ × ℝ × ℝ
+#check ind' 2 -- ind' 2 : fin 1.succ.succ → fin 1.succ.succ → ℝ
+end exercise2A3
+
+namespace exercise2A11
+-- Exercise 2.A.11
+variables (k : Type) (V : Type) [field k] [add_comm_group V] [module k V] 
+
+example (n : ℕ) (v : fin n → V) (lin_indep : linear_independent k v) (w : V) : linear_independent k (matrix.vec_cons w v) ↔ w ∉ submodule.span k (v '' (set.univ : set (fin n)))
+:=
+begin
+  split,
+  intros h hw,
   
--- end
+
+end
+
+variables (n : ℕ) (v : fin n → V) (f : fin n →₀ k)
+#check finsupp.sum f (λ i s, s•(v i))
+
+example (n : ℕ) (v : fin n → V) (w : V) : 
+∃ f : fin n →₀ k, w = finsupp.sum f (λ i s, s • v i) ↔ w ∈ submodule.span k (v '' (set.univ : set (fin n))) := sorry
 
 
 
-
-
-
-
-
--- -- namespace hidden
-
--- -- inductive nat : Type
--- -- | zero : nat
--- -- | succ : nat → nat
--- -- -- BEGIN
--- -- namespace nat
-
--- -- def add (m n : nat) : nat :=
-
--- -- -- nat.rec_on n m (λ n add_m_n, succ add_m_n)
-
--- -- -- try it out
--- -- #reduce add (succ zero) (succ (succ zero))
-
--- end nat
--- -- END
-
--- end hidden
+end exercise2A11
