@@ -1,9 +1,35 @@
 import tactic
 import linear_algebra.basis
-import data.real.basic
+import data.complex.basic
 
 variables (F : Type) [field F] (V : Type) [add_comm_group V] [module F V]
 
+section comp
+open complex
+
+--exercise 1.1
+example (a b : ℝ) (h : a ≠ 0 ∨ b ≠ 0) : ∃ c d : ℝ,
+  (1 : ℂ) / (a + b*I) = c + d*I :=
+begin
+  let z : ℂ := 1/(a + b*I),
+  use [z.re, z.im],
+  change z = z.re + z.im*I,
+  exact (re_add_im z).symm,
+end
+
+--Thanks Alex Best for a much better proof of this!
+--exercise 1.2
+example : ((-1 + (real.sqrt 3 : ℂ)*I)/2)^3 = 1 :=
+begin
+  field_simp,
+  ring_nf,
+  norm_num,
+  ring_nf,
+  norm_cast,
+  norm_num,
+end
+
+end comp
 def subspace' (U : set V) :=
   ((0 : V) ∈ U) ∧
   (∀ u v ∈ U, u + v ∈ U) ∧ 
@@ -104,19 +130,24 @@ begin
   split,
   { rintros _ ⟨n₁, n₂, rfl⟩ _ ⟨m₁, m₂, rfl⟩, --U closed under addition
     use [n₁ + m₁, n₂ + m₂],
-    tidy,},
+    simp only [prod.mk_add_mk, int.cast_add],},
   split,
   { rintros _ ⟨n, m, rfl⟩, --U closed under negation
     use [-n, -m],
-    tidy,},
+    simp only [prod.neg_mk, int.cast_neg],},
   { rintros ⟨a, b, h⟩, clear a, clear b,    --but U not closed under scaling
     specialize h (1/2) (1,0) ⟨1,0,by simp⟩, --and is therefore not a subspace
     rcases h with ⟨n, m, hnm⟩,
-    simp * at *,
+    rw prod.smul_mk at hnm,
+    rw prod.mk.inj_iff at hnm,
     cases hnm with h a, clear a,
-    sorry,
+    field_simp at h,
+    norm_cast at h,
+    have h1 := odd_one,
+    rw h at h1,
+    rw int.odd_iff_not_even at h1,
+    apply h1,
+    simp,
+    --probably a much better way to do this?
   }
 end
-
---lemma that will help with 1.6
-example : ¬(∃ a : ℤ, 2*a = 1) := sorry
