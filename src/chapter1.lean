@@ -151,3 +151,33 @@ begin
     --probably a much better way to do this?
   }
 end
+
+--exercise 1.7
+example : ∃ U : set (ℝ × ℝ), (nonempty U ∧
+  (∀ a : ℝ, ∀ u ∈ U, a•u ∈ U) ∧ 
+  ¬(subspace' ℝ (ℝ × ℝ) U)) :=
+begin
+  use {v : ℝ × ℝ | ∃ x : ℝ, v = (0,x) ∨ v = (x,0)},
+  split,
+  { use [(0,0),0], --U is nonempty
+    left,
+    refl,
+  },
+  split,
+  { rintros r u ⟨x, hx⟩, --U closed under scaling
+    cases hx,
+    { use r*x,
+      left,
+      simp [hx],},
+    { use r*x,
+      right,
+      simp [hx],},
+  },
+  { rintros ⟨a, h, b⟩, clear a, clear b,        --but U not closed under addition
+    specialize h (1,0) ⟨1,or.intro_right _ rfl⟩ --and is therefore not a subspace
+                (0,1) ⟨1,or.intro_left _ rfl⟩,
+    cases h with x hx,
+    simp at hx,
+    exact hx,
+  }
+end
