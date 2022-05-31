@@ -31,7 +31,6 @@ end
 
 end comp
 
-#check submodule
 def subspace' (U : set V) :=
   ((0 : V) ∈ U) ∧
   (∀ u v ∈ U, u + v ∈ U) ∧ 
@@ -199,4 +198,47 @@ begin
     rw set.mem_Inter at *, --intersection closed under scaling
     exact λ a, (H a).2.2 r u (hu a),
   }
+end
+
+--exercise 1.9
+example (U U' : set V) (hU : subspace' F V U) (hU' : subspace' F V U') :
+  subspace' F V (U ∪ U') ↔ U ⊆ U' ∨ U' ⊆ U :=
+begin
+  split,
+  { contrapose!,
+    repeat {rw set.not_subset_iff_exists_mem_not_mem},
+    rintros ⟨⟨x, hxU, hxU'⟩,⟨y, hyU', hyU⟩⟩ h,    --if neither subspace is a subset of the other,
+    have hx : x ∈ U ∪ U',                         --we can choose x ∈ U \ U', y ∈ U' \ U
+      {left, exact hxU},
+    have hy : y ∈ U ∪ U',
+      {right, exact hyU'},
+    have hxy : x + y ∈ U ∪ U',                    --then x + y ∈ U ∪ U', since U ∪ U' subspace 
+      {exact h.2.1 x hx y hy},
+    cases hxy,
+      { apply hyU,                                --but x + y ∈ U → y ∈ U, and x + y ∈ U' → x ∈ U'
+        convert hU.2.1 ((-1)•x) (hU.2.2 (-1) x hxU) (x + y) (hxy),
+        simp,},
+      { apply hxU',
+        convert hU'.2.1 ((-1)•y) (hU'.2.2 (-1) y hyU') (x + y) (hxy),
+        simp,},
+  },
+  { intros h,
+    cases h,
+    { rw set.union_eq_self_of_subset_left h, --if U ⊆ U', then U ∪ U' = U' 
+      exact hU'},                            --is a subspace
+    { rw set.union_eq_self_of_subset_right h,
+      exact hU},
+  }
+end
+
+--exercise 1.10
+example (U : set V) (hU : subspace' F V U) : {v | ∃ x y ∈ U, v = x + y} = U :=
+begin
+  ext a,
+  split,
+  { rintros ⟨x, hx, y, hy, rfl⟩,
+    exact hU.2.1 x hx y hy,},
+  { intro ha,
+    use [a, ha, 0, hU.1],
+    simp,}
 end
