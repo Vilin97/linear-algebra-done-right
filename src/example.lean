@@ -118,21 +118,20 @@ namespace exercise2A11
 -- Exercise 2.A.11
 variables (k : Type) (V : Type) [field k] [add_comm_group V] [module k V] 
 
-example (n : ℕ) (v : fin n → V) (lin_indep : linear_independent k v) (w : V) : linear_independent k (matrix.vec_cons w v) ↔ w ∉ submodule.span k (v '' (set.univ : set (fin n)))
+example (n : ℕ) (v : fin n → V) (lin_indep : linear_independent k v) (w : V) : linear_independent k (matrix.vec_cons w v) ↔ w ∉ submodule.span k (set.range v)
 :=
 begin
-  split,
-  intros h hw,
+  rw linear_independent_fin_succ,
+  simp,
+  
   
 
 end
 
-variables (n : ℕ) (v : fin n → V) (f : fin n →₀ k)
-#check finsupp.sum f (λ i s, s•(v i))
-
-example (n : ℕ) (v : fin n → V) (w : V) : 
-∃ f : fin n →₀ k, w = finsupp.sum f (λ i s, s • v i) ↔ w ∈ submodule.span k (v '' (set.univ : set (fin n))) := sorry
-
+variables (n : ℕ) (α : Type) (v : fin n → α) (w : α)
+#check matrix.vec_cons w v
+#check fin.cons w v
+#check fin.snoc v w
 
 
 end exercise2A11
