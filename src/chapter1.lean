@@ -30,6 +30,8 @@ begin
 end
 
 end comp
+
+#check submodule
 def subspace' (U : set V) :=
   ((0 : V) ∈ U) ∧
   (∀ u v ∈ U, u + v ∈ U) ∧ 
@@ -179,5 +181,22 @@ begin
     cases h with x hx,
     simp at hx,
     exact hx,
+  }
+end
+
+--exercise 1.8
+example (α : Type) (ι : α → set V) (H : ∀ a : α, subspace' F V (ι a)) :
+        subspace' F V (⋂ a : α, ι a) :=
+begin
+  split,
+  { rw set.mem_Inter,      --intersection contains 0
+    exact λ a, (H a).1,},
+  split,
+  { intros u hu v hv,      --intersection closed under addition
+    rw set.mem_Inter at *,
+    exact λ a, (H a).2.1 u (hu a) v (hv a),},
+  { intros r u hu,
+    rw set.mem_Inter at *, --intersection closed under scaling
+    exact λ a, (H a).2.2 r u (hu a),
   }
 end
