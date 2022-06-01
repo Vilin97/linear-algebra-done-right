@@ -1,6 +1,7 @@
 import tactic
 import linear_algebra.basis
 import data.complex.basic
+import data.polynomial.coeff
 
 variables (F : Type) [field F] (V : Type) [add_comm_group V] [module F V]
 
@@ -241,4 +242,26 @@ begin
   { intro ha,
     use [a, ha, 0, hU.1],
     simp,}
+end
+
+--exercise 1.11, part i
+example (U₁ U₂ : submodule F V) : U₁ ⊔ U₂ = U₂ ⊔ U₁ := sup_comm
+
+--exercise 1.11, part ii
+example (U₁ U₂ U₃ : submodule F V) : (U₁ ⊔ U₂) ⊔ U₃ = U₁ ⊔ (U₂ ⊔ U₃) := sup_assoc
+
+--exercise 1.12, part i
+example : ∃ U : submodule F V, ∀ U' : submodule F V, U ⊔ U' = U' :=
+begin
+  use ⊥,
+  intro U',
+  exact bot_sup_eq,
+end
+
+--exercise 1.12, part ii
+example : ∀ U : submodule F V, (∃ U' : submodule F V, U ⊔ U' = ⊥) → U = ⊥ :=
+begin
+  rintros U ⟨U', hU'⟩,
+  rw sup_eq_bot_iff at hU',
+  exact hU'.left,
 end
