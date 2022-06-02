@@ -274,6 +274,9 @@ begin
   exact bot_ne_top,
 end
 
+section direct_sum
+local notation U `⊕` W := U ⊔ W = ⊤ ∧ U ⊓ W = ⊥
+
 --exercise 1.14
 open polynomial
 def U : subspace F (polynomial F) :=  --can these easy proofs be more automated?
@@ -313,7 +316,7 @@ def W : subspace F (polynomial F) :=
     end,}
 
 --the actual problem. This was pretty painful
-example : ∃ W : subspace F (polynomial F), (U F) ⊔ W = ⊤ ∧ (U F) ⊓ W = ⊥ :=
+example : ∃ W : subspace F (polynomial F), (U F) ⊕ W :=
 begin
   use W F,
   split,
@@ -349,3 +352,68 @@ begin
       exact ⟨(U F).zero_mem, (W F).zero_mem⟩,},
   }
 end
+
+--exercise 1.15
+def U₁ : submodule F (F × F) :=           --could also define U₁ as span {(1,0)}
+{ carrier := {x | x.1 = 0},               --decided not to, since span isn't defined
+  add_mem' := λ x y hx hy, by simp * at *,--until ch2
+  zero_mem' := by simp,
+  smul_mem' := λ c x hx, by simp * at *,
+}
+
+def U₂ : submodule F (F × F) :=
+{ carrier := {x | x.2 = 0},
+  add_mem' := λ x y hx hy, by simp * at *,
+  zero_mem' := by simp,
+  smul_mem' := λ c x hx, by simp * at *,
+}
+
+def W' : submodule F (F × F) :=
+{ carrier := {x | x.1 = x.2},
+  add_mem' := λ x y hx hy, by simp * at *,
+  zero_mem' := by simp,
+  smul_mem' := λ c x hx, by simp * at *,
+}
+
+example : ∃ U₁ U₂ W : subspace F (F × F), (U₁ ⊕ W) ∧ (U₂ ⊕ W) ∧ (U₁ ≠ U₂) :=
+begin
+  use [U₁ F, U₂ F, W' F],
+  split,
+  { split,
+    { rw eq_top_iff,    --U₁ + W = V
+      rintro ⟨a,b⟩ h, clear h,
+      have h1 : ((0 : F), b-a) ∈ U₁ F := by simp [U₁],
+      have h2 : (a, a) ∈ W' F := by simp [W'],
+      convert submodule.add_mem_sup h1 h2;
+      simp,},
+    { rw eq_bot_iff,    --and U₁ ∩ W = 0
+      rintro ⟨a,b⟩ h,
+      simp [U₁, W'] at *,
+      rw ←h.2,
+      exact ⟨h.1,h.1⟩,
+    },
+  },
+  split,
+  { split,
+    { rw eq_top_iff,    --U₂ + W = V
+      rintro ⟨a,b⟩ h, clear h,
+      have h1 : (a-b, (0 : F)) ∈ U₂ F := by simp [U₂],
+      have h2 : (b, b) ∈ W' F := by simp [W'],
+      convert submodule.add_mem_sup h1 h2;
+      simp,},
+    { rw eq_bot_iff,    --and U₂ ∩ W = 0
+      rintro ⟨a,b⟩ h,
+      simp [U₂, W'] at *,
+      rw h.2,
+      exact ⟨h.1,h.1⟩,},
+  },
+  { intro h,                --U₁ ≠ U₂ since (0,1) ∈ U₁ \ U₂
+    let x : F × F := (0,1),
+    have hx : x ∈ U₁ F := by simp [x, U₁],
+    rw h at hx,
+    simp [x, U₂] at hx,
+    exact hx,
+  }
+end
+
+end direct_sum
