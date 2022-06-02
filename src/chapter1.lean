@@ -267,7 +267,7 @@ begin
 end
 
 --exercise 1.13
-example : ∃ U₁ U₂ W : submodule ℝ (ℝ × ℝ), (U₁ ⊔ W = U₂ ⊔ W) ∧ (U₁ ≠ U₂) :=
+example : ∃ U₁ U₂ W : submodule F (F × F), (U₁ ⊔ W = U₂ ⊔ W) ∧ (U₁ ≠ U₂) :=
 begin
   use [⊥, ⊤, ⊤],
   simp,
@@ -276,8 +276,8 @@ end
 
 --exercise 1.14
 open polynomial
-def U : subspace ℝ (polynomial ℝ) :=  --can these easy proofs be more automated?
-{ carrier := {f | ∃ a b : ℝ, f = a•X^2 + b•X^5},
+def U : subspace F (polynomial F) :=  --can these easy proofs be more automated?
+{ carrier := {f | ∃ a b : F, f = a•X^2 + b•X^5},
   add_mem' :=
     begin
       rintro f g ⟨a,b,rfl⟩ ⟨c,d,rfl⟩,
@@ -294,7 +294,7 @@ def U : subspace ℝ (polynomial ℝ) :=  --can these easy proofs be more automa
       repeat {rw mul_smul},
     end,}
 
-def W : subspace ℝ (polynomial ℝ) :=
+def W : subspace F (polynomial F) :=
 { carrier := {f | f.coeff 2 = 0 ∧ f.coeff 5 = 0},
   add_mem' :=
     begin
@@ -313,9 +313,9 @@ def W : subspace ℝ (polynomial ℝ) :=
     end,}
 
 --the actual problem. This was pretty painful
-example : ∃ W : subspace ℝ (polynomial ℝ), U ⊔ W = ⊤ ∧ U ⊓ W = ⊥ :=
+example : ∃ W : subspace F (polynomial F), (U F) ⊔ W = ⊤ ∧ (U F) ⊓ W = ⊥ :=
 begin
-  use W,
+  use W F,
   split,
   { ext,
     split,
@@ -326,8 +326,8 @@ begin
       let f := a•X^2 + b•X^5,
       let g := x - f,
       have hx : x = f + g := by simp,
-      have hf : f ∈ U := by use [a,b],
-      have hg : g ∈ W,
+      have hf : f ∈ (U F) := by use [a,b],
+      have hg : g ∈ (W F),
       { split;
         simp [g, f, coeff_X_pow],},
       rw hx,
@@ -346,6 +346,6 @@ begin
     },
     { simp,
       rintro rfl,
-      exact ⟨U.zero_mem, W.zero_mem⟩,},
+      exact ⟨(U F).zero_mem, (W F).zero_mem⟩,},
   }
 end
