@@ -1,6 +1,8 @@
 import tactic -- imports all the Lean tactics
 import linear_algebra.basis
 import data.real.basic
+import data.complex.basic
+import data.complex.module
 import data.matrix.notation
 
 -- Exercise 2.A.1
@@ -101,6 +103,7 @@ def ind' (t : ℝ) :=
 
 example : ∃ t : ℝ, ¬ linear_independent ℝ (ind' t) :=
 begin
+  unfold ind',
   use 2,
   rw fintype.not_linear_independent_iff,
   use ![3, -2, -1],
@@ -110,9 +113,29 @@ begin
   norm_num,
 end
 
-#check ind 2 -- ind 2 : ι → ℝ × ℝ × ℝ
-#check ind' 2 -- ind' 2 : fin 1.succ.succ → fin 1.succ.succ → ℝ
 end exercise2A3
+
+namespace exercise2A5
+open complex 
+
+example : linear_independent ℝ ![1+I, 1-I] :=
+begin
+  rw fintype.linear_independent_iff,
+  intros g h i,
+  simp [fin.sum_univ_succ, ext_iff] at h,
+  have h1: g 0 + g 1 + (g 0 + - g 1) = 0+0,
+    exact congr (congr_arg has_add.add h.left) h.right,
+  have h2: g 0 + g 1 - (g 0 + - g 1) = 0-0,
+    exact congr (congr_arg has_sub.sub h.left) h.right,
+  ring_nf at h1,
+  ring_nf at h2,
+  suggest,
+  -- wanna do cases i
+  sorry,
+  
+end
+
+end exercise2A5
 
 namespace exercise2A11
 -- Exercise 2.A.11
@@ -122,16 +145,10 @@ example (n : ℕ) (v : fin n → V) (lin_indep : linear_independent k v) (w : V)
 :=
 begin
   rw linear_independent_fin_succ,
-  simp,
-  
-  
-
+  have : fin.tail (matrix.vec_cons w v) = v,
+  { nth_rewrite 1 ← @fin.tail_cons _ (λ_,V) w v,
+  refl, },
+  simp [this, lin_indep],
 end
-
-variables (n : ℕ) (α : Type) (v : fin n → α) (w : α)
-#check matrix.vec_cons w v
-#check fin.cons w v
-#check fin.snoc v w
-
 
 end exercise2A11
