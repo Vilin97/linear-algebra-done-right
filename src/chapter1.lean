@@ -276,7 +276,7 @@ end
 
 --exercise 1.14
 open polynomial
-def U : subspace ℝ (polynomial ℝ) :=
+def U : subspace ℝ (polynomial ℝ) :=  --can these easy proofs be more automated?
 { carrier := {f | ∃ a b : ℝ, f = a•X^2 + b•X^5},
   add_mem' :=
     begin
@@ -285,11 +285,7 @@ def U : subspace ℝ (polynomial ℝ) :=
       repeat {rw add_smul},
       ring,
     end,
-  zero_mem' := 
-    begin
-      use [0,0],
-      simp,
-    end,
+  zero_mem' := ⟨0,0, by simp⟩,
   smul_mem' := 
     begin
       rintro c f ⟨a,b,rfl⟩,
@@ -324,8 +320,7 @@ begin
   { ext,
     split,
     { exact λ _, by triv,},
-    {
-      intro a, clear a,
+    { intro a, clear a,
       let a := x.coeff 2,
       let b := x.coeff 5,
       let f := a•X^2 + b•X^5,
@@ -333,14 +328,8 @@ begin
       have hx : x = f + g := by simp,
       have hf : f ∈ U := by use [a,b],
       have hg : g ∈ W,
-      { split,
-        { simp [g, f],
-          right,
-          apply coeff_X_pow,},
-        { simp [g, f],
-          rw coeff_X_pow,
-          simp,}
-      },
+      { split;
+        simp [g, f, coeff_X_pow],},
       rw hx,
       exact submodule.add_mem_sup hf hg,
     }
@@ -349,16 +338,8 @@ begin
     split,
     { rintro ⟨hxU, hxW⟩,
       rcases hxU with ⟨a,b, hx⟩,
-      have ha : a = x.coeff 2,
-      { simp [hx],
-        right,
-        apply coeff_X_pow,
-      },
-      have hb : b = x.coeff 5,
-      { simp [hx],
-        right,
-        apply coeff_X_pow,
-      },
+      have ha : a = x.coeff 2 := by simp [hx, coeff_X_pow],
+      have hb : b = x.coeff 5 := by simp [hx, coeff_X_pow],
       cases hxW with hx1 hx2,
       rw [ha, hb, hx1, hx2] at hx,
       simp [hx],
