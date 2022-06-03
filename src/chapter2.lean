@@ -78,26 +78,7 @@ begin
   simp, split, ring, split, ring, ring,
 end
 
--- approach 2
-@[derive fintype] inductive ι : Type
-| i1 : ι
-| i2 : ι
-| i3 : ι
-
-def ind (t : ℝ) (i:ι) : ℝ × ℝ × ℝ :=
-ι.cases_on i (3,1,4) (2,-3,5) (5,9,t)
-
-example : ∃ t : ℝ, ¬ linear_independent ℝ (ind t) := 
-begin
-  use 2,
-  rw fintype.not_linear_independent_iff,
-  use (λ i, ι.cases_on i (3) (-2) (-1)),
-  split,
-  sorry,
-  sorry,
-end
-
---approach 3
+--approach 2 (credit goes to Alex Best)
 def ind' (t : ℝ) :=
 ![![3,1,4], ![2,-3,5], ![5,9,t]]
 
@@ -129,10 +110,22 @@ begin
     exact congr (congr_arg has_sub.sub h.left) h.right,
   ring_nf at h1,
   ring_nf at h2,
-  suggest,
-  -- wanna do cases i
-  sorry,
-  
+  fin_cases i,
+  -- linear_combination 1/2*h.1 + 1/2*h.2 with {normalize := ff},
+  linarith,
+  linarith,
+end
+
+example : ¬ linear_independent ℂ ![1+I, 1-I] :=
+begin
+  rw fintype.not_linear_independent_iff,
+  use ![-1,I],
+  split,
+  norm_num [fin.sum_univ_succ],
+  ring_nf,
+  simp only [I_sq, neg_neg, sub_self],
+  use 0,
+  simp only [matrix.cons_val_zero, ne.def, neg_eq_zero, one_ne_zero, not_false_iff],
 end
 
 end exercise2A5
@@ -148,7 +141,7 @@ begin
   have : fin.tail (matrix.vec_cons w v) = v,
   { nth_rewrite 1 ← @fin.tail_cons _ (λ_,V) w v,
   refl, },
-  simp [this, lin_indep],
+  simp only [this, lin_indep, matrix.cons_val_zero, true_and],
 end
 
 end exercise2A11
