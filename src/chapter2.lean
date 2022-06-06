@@ -7,6 +7,14 @@ import data.matrix.notation
 
 -- Exercise 2.A.1
 
+variables (k : Type) (V : Type) [field k] [add_comm_group V] [module k V] 
+
+lemma matrix.fin_tail_cons (α : Type) (n : ℕ) (w : α) (v : fin n → α) : fin.tail (matrix.vec_cons w v) = v :=
+begin
+  nth_rewrite 1 ← @fin.tail_cons _ (λ_,α) w v,
+  refl,
+end
+
 namespace exercise2A1
 
 open submodule
@@ -111,7 +119,7 @@ begin
   ring_nf at h1,
   ring_nf at h2,
   fin_cases i,
-  -- linear_combination 1/2*h.1 + 1/2*h.2 with {normalize := ff},
+  -- linear_combination (h.1, 1/2) (h.2, 1/2),
   linarith,
   linarith,
 end
@@ -130,18 +138,69 @@ end
 
 end exercise2A5
 
+namespace exercise2A6
+
+example (v1 v2 v3 v4: V) (lin_indep : linear_independent k ![v1, v2, v3, v4]) : linear_independent k ![v1-v2, v2-v3, v3-v4, v4] :=
+begin
+  rw fintype.linear_independent_iff at *,
+  intros g h,
+  let f := ![g 0, g 1 - g 0, g 2 - g 1, g 3 - g 2],
+  specialize lin_indep f,
+  suffices  hf : ∀ (i : fin 4), f i = 0,
+  have g0 : g 0 = 0,
+    calc g 0 = f 0 : rfl
+        ...  = 0 : hf 0,
+  have g1 : g 1 = 0,
+    calc g 1 = g 1 - g 0 + g 0 : by ring
+      ... = f 1 + g 0 : by refl
+      ... = 0 : by rw [hf 1, g0, zero_add],
+  have g2 : g 2 = 0,
+    calc g 2 = g 2 - g 1 + g 1 : by ring
+      ... = f 2 + g 1 : by refl
+      ... = 0 : by rw [hf 2, g1, zero_add],
+  have g3 : g 3 = 0,
+    calc g 3 = g 3 - g 2 + g 2 : by ring
+      ... = f 3 + g 2 : by refl
+      ... = 0 : by rw [hf 3, g2, zero_add],
+  
+  intro i,
+  fin_cases i,
+  exact g0,
+  exact g1,
+  exact g2,
+  exact g3,
+
+  apply lin_indep,
+  calc finset.univ.sum (λ (i : fin 4), f i • ![v1, v2, v3, v4] i) 
+            = f 0 • v1 + f 1 • v2 + f 2 • v3 + f 3 • v4 : by sorry
+     ...    = g 0 • v1 + (g 1 - g 0) • v2 + (g 2 - g 1) • v3 + (g 3 - g 2) • v4 : rfl
+     ...    = g 0 • (v1 - v2) + g 1 • (v2 - v3) + g 2 • (v3 - v4) + g 3 • v4 : by sorry
+     ...    = finset.univ.sum (λ (i : fin 4), g i • ![v1 - v2, v2 - v3, v3 - v4, v4] i) : sorry
+     ...    = 0 : h,
+
+end
+
+end exercise2A6
+
+namespace exercise2A8
+
+example (m : ℕ) (v : fin m → V) (lin_indep : linear_independent k v) (a : k) (a ≠ 0) : linear_independent k (λ i, a • v i) := 
+begin
+  rw fintype.linear_independent_iff at *,
+  intros g h,
+  sorry,
+end
+
+end exercise2A8
+
 namespace exercise2A11
 -- Exercise 2.A.11
-variables (k : Type) (V : Type) [field k] [add_comm_group V] [module k V] 
 
 example (n : ℕ) (v : fin n → V) (lin_indep : linear_independent k v) (w : V) : linear_independent k (matrix.vec_cons w v) ↔ w ∉ submodule.span k (set.range v)
 :=
 begin
   rw linear_independent_fin_succ,
-  have : fin.tail (matrix.vec_cons w v) = v,
-  { nth_rewrite 1 ← @fin.tail_cons _ (λ_,V) w v,
-  refl, },
-  simp only [this, lin_indep, matrix.cons_val_zero, true_and],
+  simp only [matrix.fin_tail_cons, lin_indep, matrix.cons_val_zero, true_and],
 end
 
 end exercise2A11
