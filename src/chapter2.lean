@@ -5,8 +5,6 @@ import data.complex.basic
 import data.complex.module
 import data.matrix.notation
 
--- Exercise 2.A.1
-
 variables (k : Type) (V : Type) [field k] [add_comm_group V] [module k V] 
 
 lemma matrix.fin_tail_cons (α : Type) (n : ℕ) (w : α) (v : fin n → α) : fin.tail (matrix.vec_cons w v) = v :=
@@ -172,26 +170,69 @@ begin
 
   apply lin_indep,
   calc finset.univ.sum (λ (i : fin 4), f i • ![v1, v2, v3, v4] i) 
-            = f 0 • v1 + f 1 • v2 + f 2 • v3 + f 3 • v4 : by sorry
+            = f 0 • v1 + f 1 • v2 + f 2 • v3 + f 3 • v4 : by 
+            begin
+              simp only [fin.sum_univ_succ, add_assoc, matrix.cons_val_zero, matrix.cons_val_succ, fin.succ_zero_eq_one, fin.succ_one_eq_two, fintype.univ_of_subsingleton, fin.mk_eq_subtype_mk, fin.mk_zero, finset.sum_singleton, add_right_inj],
+              refl,
+            end
      ...    = g 0 • v1 + (g 1 - g 0) • v2 + (g 2 - g 1) • v3 + (g 3 - g 2) • v4 : rfl
-     ...    = g 0 • (v1 - v2) + g 1 • (v2 - v3) + g 2 • (v3 - v4) + g 3 • v4 : by sorry
-     ...    = finset.univ.sum (λ (i : fin 4), g i • ![v1 - v2, v2 - v3, v3 - v4, v4] i) : sorry
+     ...    = g 0 • (v1 - v2) + g 1 • (v2 - v3) + g 2 • (v3 - v4) + g 3 • v4 : by 
+            begin
+              simp only [smul_sub, sub_smul],
+              abel,
+            end
+     ...    = finset.univ.sum (λ (i : fin 4), g i • ![v1 - v2, v2 - v3, v3 - v4, v4] i) : by
+            begin
+              simp only [fin.sum_univ_succ, add_assoc, matrix.cons_val_zero, matrix.cons_val_succ, fin.succ_zero_eq_one, fin.succ_one_eq_two, fintype.univ_of_subsingleton, fin.mk_eq_subtype_mk, fin.mk_zero, finset.sum_singleton, add_right_inj],
+              refl,
+            end
      ...    = 0 : h,
-
 end
 
 end exercise2A6
 
 namespace exercise2A8
 
-example (m : ℕ) (v : fin m → V) (lin_indep : linear_independent k v) (a : k) (a ≠ 0) : linear_independent k (λ i, a • v i) := 
+example (m : ℕ) (v : fin m → V) (lin_indep : linear_independent k v) (a : k) : a ≠ 0 → linear_independent k (λ i, (a : k) • v i) := 
 begin
   rw fintype.linear_independent_iff at *,
-  intros g h,
-  sorry,
+  intros ha g h,
+  specialize lin_indep (λ i, g i • a),
+  simp only [←smul_smul, ha, algebra.id.smul_eq_mul, mul_eq_zero, or_false] at lin_indep,
+  exact lin_indep h,
 end
 
 end exercise2A8
+
+namespace exercise2A9
+
+example (v w : V) (hw : w = -v) (hv : v ≠ (0:V)) : linear_independent k ![v] ∧ linear_independent k ![w] ∧ ¬ linear_independent k ![v+w] :=
+begin
+  split,
+  simp only [linear_independent_unique, hv, matrix.cons_val_fin_one, ne.def, not_false_iff],
+  split,
+  rw hw,
+  simp only [linear_independent_unique, hv, matrix.cons_val_fin_one, ne.def, neg_eq_zero, not_false_iff],
+  rw [hw, add_right_neg],
+  simp only [linear_independent_unique_iff, matrix.cons_val_fin_one, ne.def, eq_self_iff_true, not_true, not_false_iff],
+end
+
+end exercise2A9
+
+namespace exercise2A10
+
+example (m : ℕ) (v : fin m → V) (lin_indep : linear_independent k v) (w : V) (not_lin_indep : ¬ linear_independent k (v+(λ _, w))) : w ∈ submodule.span k (set.range v) := 
+begin
+  rw fintype.not_linear_independent_iff at not_lin_indep,
+  cases not_lin_indep with g hg,
+  simp only [pi.add_apply, smul_add, ne.def, finset.sum_add_distrib, ← finset.sum_smul] at hg,
+  let G : k := finset.univ.sum g, -- TODO
+  -- have G ≠ 0,
+  
+  sorry,
+end
+
+end exercise2A10
 
 namespace exercise2A11
 -- Exercise 2.A.11
