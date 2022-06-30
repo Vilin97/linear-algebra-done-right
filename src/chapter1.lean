@@ -127,7 +127,7 @@ begin
   use {v : (ℝ × ℝ) | ∃ n m : ℤ, v = (n,m)},
   split,
   { use [(0,0),0,0], --U is nonempty
-    refl,
+    simp only [int.cast_zero],
   },
   split,
   { rintros _ ⟨n₁, n₂, rfl⟩ _ ⟨m₁, m₂, rfl⟩, --U closed under addition
