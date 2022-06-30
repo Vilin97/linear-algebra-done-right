@@ -13,12 +13,12 @@ begin
   norm_num,
 end
 
-example : ((-1 + (real.sqrt 3 : ℂ)*I)/2)^3 = 1 :=
-begin
-  have : (real.sqrt 3 : ℂ)^2 * I^2 = -3,
-  { simp, exact_mod_cast @real.sq_sqrt 3 (by norm_num) },
-  linear_combination (this, (-3+(real.sqrt(3)*I))/8),
-end
+-- example : ((-1 + (real.sqrt 3 : ℂ)*I)/2)^3 = 1 :=
+-- begin
+--   have : (real.sqrt 3 : ℂ)^2 * I^2 = -3,
+--   { simp, exact_mod_cast @real.sq_sqrt 3 (by norm_num) },
+--   linear_combination (this, (-3+(real.sqrt(3)*I))/8),
+-- end
 
 variables (k : Type) (V : Type) [field k] [add_comm_group V] [module k V] 
 variables (n : ℕ) (w : V)

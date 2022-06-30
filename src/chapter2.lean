@@ -117,7 +117,6 @@ begin
   ring_nf at h1,
   ring_nf at h2,
   fin_cases i,
-  -- linear_combination (h.1, 1/2) (h.2, 1/2),
   linarith,
   linarith,
 end
